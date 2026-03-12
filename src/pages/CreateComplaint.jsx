@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Send, Loader2, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import API_BASE from '../api';
 
 const CreateComplaint = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const CreateComplaint = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:8081/api/complaints', formData);
+      await axios.post(`${API_BASE}/api/complaints`, formData);
       setLoading(false);
       navigate('/complaints');
     } catch (err) {

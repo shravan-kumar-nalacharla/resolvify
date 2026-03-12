@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Loader2, PlusCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import API_BASE from '../api';
 
 const ComplaintList = () => {
   const [complaints, setComplaints] = useState([]);
@@ -14,7 +15,7 @@ const ComplaintList = () => {
 
   const fetchComplaints = async () => {
     try {
-      const response = await axios.get('http://localhost:8081/api/complaints');
+      const response = await axios.get(`${API_BASE}/api/complaints`);
       setComplaints(response.data);
       setLoading(false);
     } catch (err) {
