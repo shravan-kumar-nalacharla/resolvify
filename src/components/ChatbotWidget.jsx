@@ -3,7 +3,7 @@ import axios from 'axios';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import API_BASE from '../api';
 
-const ChatbotWidget = () => {
+const ChatbotWidget = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { sender: 'bot', text: 'Hi! I am the Resolvify AI Assistant. How can I help you map a complaint or resolve an issue today?' }
@@ -34,7 +34,7 @@ const ChatbotWidget = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_BASE}/api/chat`, { message: userMsg.text });
+      const response = await axios.post(`${API_BASE}/api/chat`, { message: userMsg.text, userId: user?.id });
       // The Gemini API response structure might return raw JSON string from RestTemplate if not mapped carefully,
       // but assuming the backend maps it correctly or returns a string. Let's handle chatResponse nicely.
       let botText = response.data.reply;

@@ -15,7 +15,8 @@ const ComplaintList = () => {
 
   const fetchComplaints = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/api/complaints`);
+      const user = JSON.parse(localStorage.getItem('user'));
+      const response = await axios.get(`${API_BASE}/api/complaints`, { params: { userId: user?.id } });
       setComplaints(response.data);
       setLoading(false);
     } catch (err) {

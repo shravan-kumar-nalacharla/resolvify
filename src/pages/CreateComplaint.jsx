@@ -23,7 +23,8 @@ const CreateComplaint = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API_BASE}/api/complaints`, formData);
+      const user = JSON.parse(localStorage.getItem('user'));
+      await axios.post(`${API_BASE}/api/complaints`, { ...formData, userId: user?.id });
       setLoading(false);
       navigate('/complaints');
     } catch (err) {
