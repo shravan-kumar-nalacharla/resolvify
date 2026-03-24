@@ -16,7 +16,17 @@ const AuthPage = ({ onLogin }) => {
       localStorage.setItem('user', JSON.stringify(data));
       onLogin(data);
     } catch (err) {
-      setError(err.response?.data || 'An error occurred. Please try again.');
+      if (err.response && err.response.data) {
+        if (typeof err.response.data === 'string') {
+          setError(err.response.data);
+        } else if (err.response.data.message) {
+          setError(err.response.data.message);
+        } else {
+          setError('An error occurred on the server.');
+        }
+      } else {
+        setError('Network Error: The backend is still starting up or offline.');
+      }
     }
   };
 
