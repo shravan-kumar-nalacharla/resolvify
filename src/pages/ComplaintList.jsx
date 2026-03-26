@@ -1,24 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, PlusCircle, AlertCircle, List } from 'lucide-react';
+import { Loader2, PlusCircle, AlertCircle, List, Search, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import API_BASE from '../api';
+import ComplaintDetailModal from '../components/ComplaintDetailModal';
+import { useToast } from '../components/Toast';
 
 const ComplaintList = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  const [searchKw, setSearchKw] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterPriority, setFilterPriority] = useState('');
+  const [selectedComplaintId, setSelectedComplaintId] = useState(null);
+  
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchComplaints();
-  }, []);
+  }, [searchKw, filterStatus, filterPriority]);
 
   const fetchComplaints = async () => {
     try {
+      setLoading(true);
       const user = JSON.parse(localStorage.getItem('user'));
-      const response = await axios.get(`${API_BASE}/api/complaints`, { params: { userId: user?.id } });
+      const params = { userId: user?.id };
+      if (searchKw) params.keyword = searchKw;
+      if (filterStatus) params.status = filterStatus;
+      if (filterPriority) params.priority = filterPriority;
+      
+      const response = await axios.get(`${API_BASE}/api/complaints/search`, { params });
       setComplaints(response.data);
       setLoading(false);
+      setError('');
     } catch (err) {
       setError('Failed to load complaints. Ensure backend is running.');
       setLoading(false);
@@ -40,6 +56,34 @@ const ComplaintList = () => {
           <PlusCircle size={20} />
           New Complaint
         </Link>
+      </div>
+
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '250px', position: 'relative' }}>
+          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--secondary)' }} />
+          <input 
+            type="text" 
+            placeholder="Search titles or descriptions..." 
+            className="form-control" 
+            style={{ paddingLeft: '2.5rem' }}
+            value={searchKw}
+            onChange={e => setSearchKw(e.target.value)}
+          />
+        </div>
+        <select className="form-control" style={{ width: 'auto' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">All Statuses</option>
+          <option value="OPEN">Open</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="RESOLVED">Resolved</option>
+          <option value="CLOSED">Closed</option>
+          <option value="REJECTED">Rejected</option>
+        </select>
+        <select className="form-control" style={{ width: 'auto' }} value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
+          <option value="">All Priorities</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
       </div>
 
       {loading && (
@@ -68,31 +112,30 @@ const ComplaintList = () => {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Priority</th>
-                <th>Status</th>
-                <th>Reported On</th>
+                <th style={{ width: '60px' }}>ID</th>
+                <th style={{ width: '35%' }}>Title</th>
+                <th style={{ width: '15%' }}>Category</th>
+                <th style={{ width: '15%' }}>Priority</th>
+                <th style={{ width: '15%' }}>Status</th>
+                <th style={{ width: '15%' }}>Reported On</th>
               </tr>
             </thead>
             <tbody>
               {complaints.map(c => (
-                <tr key={c.id}>
-                  <td style={{ fontWeight: '500', color: 'var(--secondary)' }}>#{c.id}</td>
-                  <td style={{ fontWeight: '500' }}>{c.title}</td>
-                  <td>{c.category}</td>
+                <tr key={c.id} onClick={() => setSelectedComplaintId(c.id)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
+                  <td style={{ fontWeight: '600', color: 'var(--secondary)' }}>#{c.id}</td>
+                  <td style={{ fontWeight: '600', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</td>
+                  <td style={{ color: 'var(--secondary)' }}>{c.category}</td>
                   <td>
-                    <span style={{ 
-                      color: c.priority === 'High' ? 'var(--danger)' : 
-                             c.priority === 'Medium' ? 'var(--warning)' : 'var(--success)',
-                      fontWeight: '600'
+                    <span className="badge" style={{ 
+                      backgroundColor: c.priority === 'High' ? '#fee2e2' : c.priority === 'Medium' ? '#ffedd5' : '#dcfce7',
+                      color: c.priority === 'High' ? '#ef4444' : c.priority === 'Medium' ? '#f97316' : '#22c55e',
                     }}>
-                      {c.priority}
+                      {c.priority || 'Low'}
                     </span>
                   </td>
                   <td>{getStatusBadge(c.status)}</td>
-                  <td style={{ color: 'var(--secondary)', fontSize: '0.9rem' }}>
+                  <td style={{ color: 'var(--secondary)', fontSize: '0.875rem' }}>
                     {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
                 </tr>
@@ -100,6 +143,14 @@ const ComplaintList = () => {
             </tbody>
           </table>
         </div>
+      )}
+      
+      {selectedComplaintId && (
+        <ComplaintDetailModal 
+          complaintId={selectedComplaintId} 
+          onClose={() => setSelectedComplaintId(null)} 
+          onUpdate={fetchComplaints}
+        />
       )}
     </div>
   );
