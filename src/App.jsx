@@ -20,10 +20,10 @@ function App() {
 
   const handleLogin = (userData) => {
     setUser(userData);
-    if (userData.role === 'ADMIN') {
+    if (userData?.role === 'ADMIN') {
       navigate('/admin');
     } else {
-      navigate('/');
+      navigate('/home');
     }
   };
 
@@ -58,9 +58,13 @@ function App() {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/complaints" element={<ComplaintList />} />
           <Route path="/create" element={<CreateComplaint />} />
-          <Route path="/admin" element={user.role === 'ADMIN' ? <AdminPanel /> : <Navigate to="/" />} />
+          <Route 
+             path="/admin" 
+             element={user?.role === 'ADMIN' ? <AdminPanel /> : <Navigate to="/home" replace />} 
+          />
         </Routes>
       </main>
       
