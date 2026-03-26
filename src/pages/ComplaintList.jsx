@@ -22,22 +22,32 @@ const ComplaintList = () => {
     fetchComplaints();
   }, [searchKw, filterStatus, filterPriority]);
 
-  const fetchComplaints = async () => {
+  const fetchComplaints = async (retries = 3) => {
     try {
       setLoading(true);
+      setError('');
       const user = JSON.parse(localStorage.getItem('user'));
       const params = { userId: user?.id };
-      if (searchKw) params.keyword = searchKw;
       if (filterStatus) params.status = filterStatus;
       if (filterPriority) params.priority = filterPriority;
       
-      const response = await axios.get(`${API_BASE}/api/complaints/search`, { params });
-      setComplaints(response.data);
+      const response = await axios.get(`${API_BASE}/api/complaints`, { params });
+      let data = response.data;
+      // Client-side keyword filter
+      if (searchKw) {
+        const kw = searchKw.toLowerCase();
+        data = data.filter(c => c.title?.toLowerCase().includes(kw) || c.description?.toLowerCase().includes(kw));
+      }
+      setComplaints(data);
       setLoading(false);
-      setError('');
     } catch (err) {
-      setError('Failed to load complaints. Ensure backend is running.');
-      setLoading(false);
+      if (retries > 0) {
+        setError('Backend is waking up, retrying...');
+        setTimeout(() => fetchComplaints(retries - 1), 3000);
+      } else {
+        setError('Failed to load complaints. Ensure backend is running.');
+        setLoading(false);
+      }
     }
   };
 
