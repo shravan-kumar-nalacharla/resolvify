@@ -24,9 +24,9 @@ const Home = () => {
   }, [user?.id]);
 
   const statItems = [
-    { icon: <Activity size={24} />, label: 'Total Submitted', value: stats.total, color: 'var(--primary)', bg: '#eef2ff' },
-    { icon: null, label: 'Open Issues', value: stats.open, color: '#2563eb', bg: '#dbeafe', dot: '#3b82f6' },
-    { icon: null, label: 'Resolved', value: stats.resolved, color: '#059669', bg: '#d1fae5', dot: '#10b981' },
+    { icon: <Activity size={24} />, label: 'Total Submitted', value: stats.total, color: 'var(--primary)', bg: 'var(--primary-light)' },
+    { icon: null, label: 'Open Issues', value: stats.open, color: 'var(--primary)', bg: '#dbeafe', dot: 'var(--primary)' },
+    { icon: null, label: 'Resolved', value: stats.resolved, color: 'var(--success)', bg: '#d1fae5', dot: 'var(--success)' },
   ];
 
   const features = [
