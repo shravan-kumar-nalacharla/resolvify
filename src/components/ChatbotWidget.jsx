@@ -86,58 +86,84 @@ User Input: "${userMsg.text}"`;
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: '56px', right: '2rem', zIndex: 1000, fontFamily: 'Inter, sans-serif' }}>
+    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 1000, fontFamily: 'Inter, sans-serif' }}>
       
+      {/* Floating Button */}
       {!isOpen && (
         <button 
           onClick={toggleChat}
-          style={{ width: '60px', height: '60px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', border: 'none', boxShadow: '0 10px 15px -3px rgba(59,130,246,0.3)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s' }}
-          onMouseOver={e => e.currentTarget.style.transform = 'scale(1.1)'}
-          onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+          style={{
+            width: '56px', height: '56px', borderRadius: '16px', backgroundColor: 'var(--primary)', color: 'white',
+            border: 'none', boxShadow: '0 8px 24px rgba(79, 70, 229, 0.35)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            animation: 'scaleIn 0.3s ease-out',
+          }}
+          onMouseOver={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(79, 70, 229, 0.4)'; }}
+          onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(79, 70, 229, 0.35)'; }}
         >
-          <MessageCircle size={32} />
+          <MessageCircle size={26} />
         </button>
       )}
 
+      {/* Chat Window */}
       {isOpen && (
-        <div style={{ width: '380px', height: '520px', backgroundColor: 'var(--surface)', borderRadius: '1rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '1px solid var(--border)' }}>
+        <div style={{
+          width: '380px', height: '520px', backgroundColor: 'var(--surface)', borderRadius: '16px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15)', display: 'flex', flexDirection: 'column',
+          overflow: 'hidden', border: '1px solid var(--border)',
+          animation: 'chatOpen 0.3s ease-out',
+        }}>
           
-          <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Header */}
+          <div style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: 'rgba(255,255,255,0.2)', padding: '0.5rem', borderRadius: '0.5rem' }}>
-                <Bot size={24} />
+              <div style={{ background: 'rgba(255,255,255,0.2)', padding: '0.4rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot size={22} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '600' }}>Resolvify AI</h3>
-                <p style={{ margin: 0, fontSize: '0.8rem', opacity: 0.8 }}>Online and ready to help</p>
+                <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Resolvify AI</h3>
+                <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.8 }}>Online and ready to help</p>
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.25rem' }}>
-              <button title="Clear Chat" onClick={clearChat} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0.25rem', opacity: 0.8 }} onMouseOver={e => e.currentTarget.style.opacity = 1} onMouseOut={e => e.currentTarget.style.opacity = 0.8}>
-                <Trash2 size={20} />
+              <button title="Clear Chat" onClick={clearChat} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0.3rem', opacity: 0.7, borderRadius: '6px', transition: 'opacity 0.2s' }}
+                onMouseOver={e => e.currentTarget.style.opacity = 1}
+                onMouseOut={e => e.currentTarget.style.opacity = 0.7}
+              >
+                <Trash2 size={18} />
               </button>
-              <button onClick={toggleChat} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0.25rem' }}>
-                <X size={24} />
+              <button onClick={toggleChat} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '0.3rem', borderRadius: '6px' }}>
+                <X size={22} />
               </button>
             </div>
           </div>
 
-          <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* Messages */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem', backgroundColor: '#f8fafc', display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             {messages.map((msg, idx) => (
               <div key={idx} style={{ alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start', display: 'flex', gap: '0.5rem', maxWidth: '85%' }}>
                 {msg.sender === 'bot' && (
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
-                    <Bot size={18} />
+                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
+                    <Bot size={16} />
                   </div>
                 )}
                 
-                <div style={{ padding: '1rem', borderRadius: '1rem', backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'white', color: msg.sender === 'user' ? 'white' : '#1e293b', boxShadow: msg.sender === 'bot' ? '0 1px 2px rgba(0,0,0,0.05)' : 'none', borderBottomRightRadius: msg.sender === 'user' ? '0.25rem' : '1rem', borderBottomLeftRadius: msg.sender === 'bot' ? '0.25rem' : '1rem', fontSize: '0.95rem', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>
+                <div style={{
+                  padding: '0.75rem 1rem', borderRadius: '12px',
+                  backgroundColor: msg.sender === 'user' ? 'var(--primary)' : 'white',
+                  color: msg.sender === 'user' ? 'white' : '#1e293b',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                  borderBottomRightRadius: msg.sender === 'user' ? '4px' : '12px',
+                  borderBottomLeftRadius: msg.sender === 'bot' ? '4px' : '12px',
+                  fontSize: '0.9rem', lineHeight: '1.5', whiteSpace: 'pre-wrap',
+                }}>
                   {msg.text}
                 </div>
 
                 {msg.sender === 'user' && (
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
-                    <User size={18} />
+                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: '#e2e8f0', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
+                    <User size={16} />
                   </div>
                 )}
               </div>
@@ -145,10 +171,10 @@ User Input: "${userMsg.text}"`;
             
             {loading && (
               <div style={{ alignSelf: 'flex-start', display: 'flex', gap: '0.5rem' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
-                  <Loader2 className="animate-spin" size={18} />
+                <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 'auto' }}>
+                  <Loader2 className="animate-spin" size={16} />
                 </div>
-                <div style={{ padding: '1rem', borderRadius: '1rem', backgroundColor: 'white', color: '#64748b', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', borderBottomLeftRadius: '0.25rem' }}>
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', backgroundColor: 'white', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderBottomLeftRadius: '4px', fontSize: '0.9rem' }}>
                   Typing...
                 </div>
               </div>
@@ -156,21 +182,32 @@ User Input: "${userMsg.text}"`;
             <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={sendMessage} style={{ padding: '1rem', backgroundColor: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.5rem' }}>
+          {/* Input */}
+          <form onSubmit={sendMessage} style={{ padding: '0.875rem', backgroundColor: 'var(--surface)', borderTop: '1px solid var(--border)', display: 'flex', gap: '0.5rem' }}>
             <input 
               type="text" 
               value={input} 
               onChange={e => setInput(e.target.value)} 
               placeholder="Type your message..." 
-              style={{ flex: 1, padding: '0.75rem 1rem', border: '1px solid var(--border)', borderRadius: '9999px', outline: 'none', fontSize: '0.95rem' }} 
+              style={{ flex: 1, padding: '0.65rem 1rem', border: '1px solid var(--border)', borderRadius: '9999px', outline: 'none', fontSize: '0.9rem', transition: 'border-color 0.2s' }} 
+              onFocus={e => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={e => e.target.style.borderColor = 'var(--border)'}
               disabled={loading}
             />
             <button 
               type="submit" 
               disabled={loading || !input.trim()} 
-              style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: input.trim() ? 'var(--primary)' : '#cbd5e1', color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() ? 'pointer' : 'default', transition: 'background-color 0.2s' }}
+              style={{
+                width: '42px', height: '42px', borderRadius: '50%',
+                backgroundColor: input.trim() ? 'var(--primary)' : '#e2e8f0',
+                color: 'white', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: input.trim() ? 'pointer' : 'default',
+                transition: 'background-color 0.2s, transform 0.15s',
+              }}
+              onMouseOver={e => { if (input.trim()) e.currentTarget.style.transform = 'scale(1.05)'; }}
+              onMouseOut={e => { e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <Send size={20} style={{ marginLeft: '-2px' }} />
+              <Send size={18} style={{ marginLeft: '-1px' }} />
             </button>
           </form>
 

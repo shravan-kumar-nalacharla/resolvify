@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Loader2, PlusCircle, AlertCircle, List, Search, Filter } from 'lucide-react';
+import { Loader2, PlusCircle, AlertCircle, List, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import API_BASE from '../api';
 import ComplaintDetailModal from '../components/ComplaintDetailModal';
@@ -55,22 +55,31 @@ const ComplaintList = () => {
     const s = status ? status.toLowerCase() : 'open';
     if(s.includes('resolv')) return <span className="badge resolved">{status}</span>;
     if(s.includes('progress')) return <span className="badge in-progress">{status}</span>;
+    if(s.includes('closed')) return <span className="badge closed">{status}</span>;
+    if(s.includes('reject')) return <span className="badge rejected">{status}</span>;
     return <span className="badge open">{status || 'Open'}</span>;
+  };
+
+  const getPriorityBadge = (priority) => {
+    const bg = priority === 'High' ? '#fee2e2' : priority === 'Medium' ? '#fef3c7' : '#d1fae5';
+    const color = priority === 'High' ? '#dc2626' : priority === 'Medium' ? '#d97706' : '#059669';
+    return <span className="badge" style={{ backgroundColor: bg, color }}>{priority || 'Low'}</span>;
   };
 
   return (
     <div className="page-container">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h1 style={{ margin: 0 }}>All Complaints</h1>
         <Link to="/create" className="btn">
-          <PlusCircle size={20} />
+          <PlusCircle size={18} />
           New Complaint
         </Link>
       </div>
 
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: '250px', position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--secondary)' }} />
+      {/* Filters */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '220px', position: 'relative' }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
           <input 
             type="text" 
             placeholder="Search titles or descriptions..." 
@@ -80,7 +89,7 @@ const ComplaintList = () => {
             onChange={e => setSearchKw(e.target.value)}
           />
         </div>
-        <select className="form-control" style={{ width: 'auto' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+        <select className="form-control" style={{ width: 'auto', minWidth: '140px' }} value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
           <option value="">All Statuses</option>
           <option value="OPEN">Open</option>
           <option value="IN_PROGRESS">In Progress</option>
@@ -88,7 +97,7 @@ const ComplaintList = () => {
           <option value="CLOSED">Closed</option>
           <option value="REJECTED">Rejected</option>
         </select>
-        <select className="form-control" style={{ width: 'auto' }} value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
+        <select className="form-control" style={{ width: 'auto', minWidth: '140px' }} value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
           <option value="">All Priorities</option>
           <option value="High">High</option>
           <option value="Medium">Medium</option>
@@ -97,55 +106,48 @@ const ComplaintList = () => {
       </div>
 
       {loading && (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
           <Loader2 className="animate-spin" color="var(--primary)" size={32} />
         </div>
       )}
 
       {error && (
-        <div style={{ background: '#fef2f2', color: 'var(--danger)', padding: '1rem', borderRadius: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <AlertCircle size={20} />
+        <div style={{ background: '#fef2f2', color: 'var(--danger)', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid #fecaca', fontSize: '0.9rem' }}>
+          <AlertCircle size={18} />
           {error}
         </div>
       )}
 
       {!loading && !error && complaints.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--secondary)', background: '#f8fafc', borderRadius: '0.5rem' }}>
+        <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-secondary)', background: '#f8fafc', borderRadius: '12px', border: '1px solid var(--border)' }}>
           <div style={{ marginBottom: '1rem' }}><List size={48} color="#cbd5e1" /></div>
-          <h3>No complaints found</h3>
-          <p>Everything looks good. No issues have been reported yet.</p>
+          <h3 style={{ margin: '0 0 0.5rem', color: 'var(--text-primary)' }}>No complaints found</h3>
+          <p style={{ margin: 0, fontSize: '0.9rem' }}>Everything looks good. No issues have been reported yet.</p>
         </div>
       )}
 
       {!loading && complaints.length > 0 && (
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border)' }}>
           <table className="data-table">
             <thead>
               <tr>
                 <th style={{ width: '60px' }}>ID</th>
                 <th style={{ width: '35%' }}>Title</th>
-                <th style={{ width: '15%' }}>Category</th>
-                <th style={{ width: '15%' }}>Priority</th>
-                <th style={{ width: '15%' }}>Status</th>
-                <th style={{ width: '15%' }}>Reported On</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Reported On</th>
               </tr>
             </thead>
             <tbody>
               {complaints.map(c => (
-                <tr key={c.id} onClick={() => setSelectedComplaintId(c.id)} style={{ cursor: 'pointer', transition: 'background-color 0.2s' }} onMouseOver={e => e.currentTarget.style.backgroundColor = '#e2e8f0'} onMouseOut={e => e.currentTarget.style.backgroundColor = 'transparent'}>
-                  <td style={{ fontWeight: '600', color: 'var(--secondary)' }}>#{c.id}</td>
-                  <td style={{ fontWeight: '600', maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title}</td>
-                  <td style={{ color: 'var(--secondary)' }}>{c.category}</td>
-                  <td>
-                    <span className="badge" style={{ 
-                      backgroundColor: c.priority === 'High' ? '#fee2e2' : c.priority === 'Medium' ? '#ffedd5' : '#dcfce7',
-                      color: c.priority === 'High' ? '#ef4444' : c.priority === 'Medium' ? '#f97316' : '#22c55e',
-                    }}>
-                      {c.priority || 'Low'}
-                    </span>
-                  </td>
+                <tr key={c.id} onClick={() => setSelectedComplaintId(c.id)} style={{ cursor: 'pointer' }}>
+                  <td style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>#{c.id}</td>
+                  <td style={{ fontWeight: 600, maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--text-primary)' }}>{c.title}</td>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{c.category}</td>
+                  <td>{getPriorityBadge(c.priority)}</td>
                   <td>{getStatusBadge(c.status)}</td>
-                  <td style={{ color: 'var(--secondary)', fontSize: '0.875rem' }}>
+                  <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                     {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}
                   </td>
                 </tr>

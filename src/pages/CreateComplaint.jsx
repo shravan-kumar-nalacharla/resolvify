@@ -61,14 +61,24 @@ const CreateComplaint = () => {
     }
   };
 
+  const priorityConfig = {
+    High: { bg: '#fee2e2', color: '#dc2626', label: '🔴 High (Urgent)' },
+    Medium: { bg: '#fef3c7', color: '#d97706', label: '🟠 Medium' },
+    Low: { bg: '#d1fae5', color: '#059669', label: '🟢 Low (Standard SLA)' },
+  };
+  const pCfg = priorityConfig[formData.priority];
+
   return (
-    <div className="page-container" style={{ maxWidth: '720px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-        <Link to="/complaints" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--secondary)', textDecoration: 'none', marginBottom: '1rem', fontWeight: '500' }}>
+    <div className="page-container" style={{ maxWidth: '680px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <Link to="/complaints" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500, transition: 'color 0.2s' }}
+          onMouseOver={e => e.currentTarget.style.color = 'var(--primary)'}
+          onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}
+        >
           <ArrowLeft size={16} /> Back to List
         </Link>
-        <h1 style={{ margin: 0, marginTop: '1rem' }}>Create New Issue</h1>
-        <p style={{ color: 'var(--secondary)', marginTop: '0.5rem' }}>Fill out the form below to report a new organizational issue.</p>
+        <h1 style={{ margin: '1rem 0 0.25rem' }}>Create New Issue</h1>
+        <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '0.9rem' }}>Fill out the form below to report a new organizational issue.</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -100,15 +110,19 @@ const CreateComplaint = () => {
           />
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem', background: 'var(--surface)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
-          <p style={{ margin: '0 0 0.5rem 0', fontWeight: 500, color: 'var(--secondary)', fontSize: '0.875rem' }}>Auto-detected Priority</p>
-          <span className={`badge ${formData.priority === 'High' ? 'rejected' : formData.priority === 'Medium' ? 'in-progress' : 'resolved'}`} style={{ 
-            padding: '0.5rem 1rem', 
-            fontSize: '1rem',
-            backgroundColor: formData.priority === 'High' ? '#fee2e2' : formData.priority === 'Medium' ? '#ffedd5' : '#dcfce7',
-            color: formData.priority === 'High' ? '#ef4444' : formData.priority === 'Medium' ? '#f97316' : '#22c55e'
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem', padding: '1rem 1.25rem', borderRadius: '10px', border: '1px solid var(--border)', background: '#f8fafc' }}>
+          <p style={{ margin: '0 0 0.5rem 0', fontWeight: 500, color: 'var(--text-secondary)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Auto-detected Priority</p>
+          <span style={{ 
+            display: 'inline-block',
+            padding: '0.4rem 1rem', 
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            borderRadius: '9999px',
+            backgroundColor: pCfg.bg,
+            color: pCfg.color,
+            transition: 'all 0.3s ease',
           }}>
-            {formData.priority === 'High' ? '🔴 High (Urgent)' : formData.priority === 'Medium' ? '🟠 Medium' : '🟢 Low (Standard SLA)'}
+            {pCfg.label}
           </span>
         </div>
 
@@ -129,11 +143,11 @@ const CreateComplaint = () => {
             </select>
           </div>
 
-        <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <button type="submit" className="btn" disabled={loading} style={{ width: '100%', height: '48px' }}>
-            {loading ? <Loader2 className="animate-spin" size={20} /> : <><Send size={20} /> Submit Issue</>}
+        <div style={{ marginTop: '2rem', display: 'flex', gap: '0.75rem' }}>
+          <Link to="/complaints" className="btn" style={{ flex: 1, height: '46px', background: '#f1f5f9', color: '#475569', border: '1px solid var(--border)' }}>Cancel</Link>
+          <button type="submit" className="btn" disabled={loading} style={{ flex: 2, height: '46px' }}>
+            {loading ? <Loader2 className="animate-spin" size={18} /> : <><Send size={18} /> Submit Issue</>}
           </button>
-          <Link to="/complaints" className="btn" style={{ width: '100%', height: '48px', background: '#f1f5f9', color: '#475569' }}>Cancel</Link>
         </div>
       </form>
     </div>
