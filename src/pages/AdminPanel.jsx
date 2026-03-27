@@ -114,38 +114,43 @@ const AdminPanel = () => {
     const s = status || 'OPEN';
     if(s === 'OPEN') return { bg: '#dbeafe', color: '#1e40af' };
     if(s === 'IN_PROGRESS') return { bg: '#fef3c7', color: '#b45309' };
-    if(s === 'RESOLVED') return { bg: '#dcfce7', color: '#166534' };
+    if(s === 'RESOLVED') return { bg: '#d1fae5', color: '#065f46' };
     if(s === 'CLOSED') return { bg: '#f1f5f9', color: '#475569' };
     return { bg: '#fee2e2', color: '#991b1b' }; // REJECTED
   };
 
   const getPriorityColor = (pri) => {
     const p = pri || 'Low';
-    if(p === 'High') return { bg: '#fee2e2', color: '#ef4444' };
-    if(p === 'Medium') return { bg: '#ffedd5', color: '#f97316' };
-    return { bg: '#dcfce7', color: '#22c55e' }; // Low
+    if(p === 'High') return { bg: '#fee2e2', color: '#dc2626' };
+    if(p === 'Medium') return { bg: '#fef3c7', color: '#d97706' };
+    return { bg: '#d1fae5', color: '#059669' }; // Low
   };
 
-  if (loading && !stats) return <div style={{display:'flex',justifyContent:'center',padding:'4rem'}}><Loader2 className="animate-spin" size={32} /></div>;
+  if (loading && !stats) return <div style={{display:'flex',justifyContent:'center',padding:'4rem'}}><Loader2 className="animate-spin" size={32} color="var(--primary)" /></div>;
+
+  const tabItems = [
+    { key: 'Dashboard', icon: <LayoutDashboard size={16} /> },
+    { key: 'All Complaints', icon: <List size={16} /> },
+    { key: 'Users', icon: <Users size={16} /> },
+  ];
 
   return (
     <div className="page-container">
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ marginBottom: '1rem', fontSize: '2rem' }}>Admin Control Center</h1>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 style={{ marginBottom: '1rem' }}>Admin Control Center</h1>
         
         {/* Pill Tabs */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'var(--surface)', padding: '0.5rem', borderRadius: '12px', border: '1px solid var(--border)', overflowX: 'auto' }}>
-          {['Dashboard', 'All Complaints', 'Users'].map(tab => (
-            <button key={tab} onClick={() => { setActiveTab(tab); setPage(1); }} style={{ 
-              padding: '0.5rem 1.5rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, flexShrink: 0,
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              background: activeTab === tab ? 'var(--primary)' : 'transparent', 
-              color: activeTab === tab ? 'white' : 'var(--secondary)' 
+        <div style={{ display: 'inline-flex', gap: '4px', background: '#f1f5f9', padding: '4px', borderRadius: '10px' }}>
+          {tabItems.map(tab => (
+            <button key={tab.key} onClick={() => { setActiveTab(tab.key); setPage(1); }} style={{ 
+              padding: '0.5rem 1.25rem', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem',
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              background: activeTab === tab.key ? 'var(--primary)' : 'transparent', 
+              color: activeTab === tab.key ? 'white' : 'var(--text-secondary)',
+              transition: 'all 0.2s ease',
             }}>
-              {tab === 'Dashboard' && <LayoutDashboard size={18} />}
-              {tab === 'All Complaints' && <List size={18} />}
-              {tab === 'Users' && <Users size={18} />}
-              {tab}
+              {tab.icon}
+              {tab.key}
             </button>
           ))}
         </div>
@@ -153,47 +158,47 @@ const AdminPanel = () => {
 
       {/* DASHBOARD TAB */}
       {activeTab === 'Dashboard' && stats && (
-        <div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            {[{label: 'Total Complaints', val: stats.totalComplaints, color: 'var(--primary)'},
-              {label: 'Open', val: stats.openCount, color: '#3b82f6'},
-              {label: 'In Progress', val: stats.inProgressCount, color: '#f59e0b'},
-              {label: 'Resolved', val: stats.resolvedCount, color: '#22c55e'}].map((s,i) => (
-                <div key={i} className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 0.5rem', color: 'var(--secondary)', fontSize: '0.9rem', fontWeight: 600 }}>{s.label}</p>
-                  <h2 style={{ margin: 0, fontSize: '2.5rem', color: s.color }}>{s.val}</h2>
+        <div className="animate-fadeIn">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            {[{label: 'Total', val: stats.totalComplaints, color: 'var(--primary)', bg: '#eef2ff'},
+              {label: 'Open', val: stats.openCount, color: '#2563eb', bg: '#dbeafe'},
+              {label: 'In Progress', val: stats.inProgressCount, color: '#d97706', bg: '#fef3c7'},
+              {label: 'Resolved', val: stats.resolvedCount, color: '#059669', bg: '#d1fae5'}].map((s,i) => (
+                <div key={i} className="card" style={{ padding: '1.25rem', textAlign: 'center' }}>
+                  <p style={{ margin: '0 0 0.25rem', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</p>
+                  <h2 style={{ margin: 0, fontSize: '2.25rem', color: s.color, fontWeight: 700 }}>{s.val}</h2>
                 </div>
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
             <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--secondary)' }}>By Category</h3>
+              <h3 style={{ marginTop: 0, marginBottom: '1.25rem', color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 600 }}>By Category</h3>
               {Object.entries(stats.complaintsByCategory).map(([cat, count]) => (
-                <div key={cat} style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                    <span>{cat}</span>
-                    <span>{count}</span>
+                <div key={cat} style={{ marginBottom: '0.875rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.85rem', fontWeight: 500 }}>
+                    <span style={{ color: 'var(--text-primary)' }}>{cat}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{count}</span>
                   </div>
-                  <div style={{ height: '8px', background: 'var(--background)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', background: 'var(--primary)', width: `${Math.max(5, (count / stats.totalComplaints) * 100)}%`, borderRadius: '4px' }}></div>
+                  <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: 'var(--primary)', width: `${Math.max(5, (count / stats.totalComplaints) * 100)}%`, borderRadius: '3px', transition: 'width 0.5s ease' }}></div>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="card" style={{ padding: '1.5rem' }}>
-              <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--secondary)' }}>By Priority</h3>
+              <h3 style={{ marginTop: 0, marginBottom: '1.25rem', color: 'var(--text-primary)', fontSize: '1rem', fontWeight: 600 }}>By Priority</h3>
               {Object.entries(stats.complaintsByPriority).map(([pri, count]) => {
-                const color = pri === 'High' ? '#ef4444' : pri === 'Medium' ? '#f97316' : '#22c55e';
+                const color = pri === 'High' ? '#dc2626' : pri === 'Medium' ? '#d97706' : '#059669';
                 return (
-                <div key={pri} style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.875rem', fontWeight: 500 }}>
-                    <span>{pri}</span>
-                    <span>{count}</span>
+                <div key={pri} style={{ marginBottom: '0.875rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem', fontSize: '0.85rem', fontWeight: 500 }}>
+                    <span style={{ color: 'var(--text-primary)' }}>{pri}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{count}</span>
                   </div>
-                  <div style={{ height: '8px', background: 'var(--background)', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', background: color, width: `${Math.max(5, (count / stats.totalComplaints) * 100)}%`, borderRadius: '4px' }}></div>
+                  <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', background: color, width: `${Math.max(5, (count / stats.totalComplaints) * 100)}%`, borderRadius: '3px', transition: 'width 0.5s ease' }}></div>
                   </div>
                 </div>
               )})}
@@ -204,40 +209,40 @@ const AdminPanel = () => {
 
       {/* ALL COMPLAINTS TAB */}
       {activeTab === 'All Complaints' && (
-        <div className="card" style={{ padding: '1.5rem' }}>
+        <div className="card animate-fadeIn" style={{ padding: '1.5rem' }}>
           
-          <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             <div style={{ position: 'relative' }}>
-              <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--secondary)' }} />
+              <Search size={16} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
               <input type="text" placeholder="Search titles or descriptions..." className="form-control" style={{ paddingLeft: '2.5rem', width: '100%' }} value={search} onChange={e => {setSearch(e.target.value); setPage(1);}} />
             </div>
             
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <select className="form-control" style={{ flex: 1, minWidth: '150px' }} value={filterStatus} onChange={e => {setFilterStatus(e.target.value); setPage(1);}}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <select className="form-control" style={{ flex: 1, minWidth: '140px' }} value={filterStatus} onChange={e => {setFilterStatus(e.target.value); setPage(1);}}>
                 <option value="">All Statuses</option>
                 <option value="OPEN">Open</option><option value="IN_PROGRESS">In Progress</option>
                 <option value="RESOLVED">Resolved</option><option value="CLOSED">Closed</option>
                 <option value="REJECTED">Rejected</option>
               </select>
-              <select className="form-control" style={{ flex: 1, minWidth: '150px' }} value={filterPri} onChange={e => {setFilterPri(e.target.value); setPage(1);}}>
+              <select className="form-control" style={{ flex: 1, minWidth: '140px' }} value={filterPri} onChange={e => {setFilterPri(e.target.value); setPage(1);}}>
                 <option value="">All Priorities</option>
                 <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
               </select>
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto', margin: '0 -1.5rem' }}>
+          <div style={{ overflowX: 'auto', margin: '0 -1.5rem', borderTop: '1px solid var(--border)' }}>
             <table className="data-table" style={{ width: '100%', minWidth: '900px' }}>
               <thead>
                 <tr>
-                  <th style={{width:'60px'}}>ID</th>
-                  <th>User</th>
+                  <th style={{width:'50px'}}>ID</th>
+                  <th style={{width:'50px'}}>User</th>
                   <th>Title</th>
                   <th>Category</th>
                   <th>Priority</th>
                   <th>Status</th>
                   <th>Created</th>
-                  <th style={{width:'180px'}}>Actions</th>
+                  <th style={{width:'170px'}}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -246,41 +251,49 @@ const AdminPanel = () => {
                   const sCol = getStatusColor(c.status);
                   return (
                   <tr key={c.id}>
-                    <td style={{ fontWeight: 600, color: 'var(--secondary)' }}>#{c.id}</td>
-                    <td><div style={{display:'flex', alignItems:'center', gap:'0.5rem'}}><div style={{width:'24px',height:'24px',background:'var(--primary)',color:'white',borderRadius:'50%',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'0.7rem',fontWeight:'bold'}}>{c.userId}</div></div></td>
-                    <td style={{ fontWeight: 600, maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.title}</td>
-                    <td>{c.category}</td>
+                    <td style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>#{c.id}</td>
                     <td>
-                      <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: pCol.bg, color: pCol.color }}>
+                      <div style={{width:'26px',height:'26px',background:'var(--primary)',color:'white',borderRadius:'50%',display:'flex',justifyContent:'center',alignItems:'center',fontSize:'0.7rem',fontWeight:'bold'}}>{c.userId}</div>
+                    </td>
+                    <td style={{ fontWeight: 600, maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: 'var(--text-primary)' }}>{c.title}</td>
+                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{c.category}</td>
+                    <td>
+                      <span style={{ padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: pCol.bg, color: pCol.color }}>
                         {c.priority || 'Low'}
                       </span>
                     </td>
                     <td>
-                      <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: sCol.bg, color: sCol.color }}>
+                      <span style={{ padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: sCol.bg, color: sCol.color }}>
                         {c.status || 'OPEN'}
                       </span>
                     </td>
-                    <td style={{ color: 'var(--secondary)', fontSize: '0.875rem' }}>{new Date(c.createdAt).toLocaleDateString()}</td>
+                    <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(c.createdAt).toLocaleDateString()}</td>
                     <td>
                       {deleteConfirmId === c.id ? (
-                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                          <span style={{ fontSize: '0.75rem', color: '#ef4444', fontWeight: 'bold' }}>Sure?</span>
-                          <button onClick={() => handleDelete(c.id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}><Check size={14}/></button>
-                          <button onClick={() => setDeleteConfirmId(null)} style={{ background: '#e2e8f0', color: '#475569', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}><X size={14}/></button>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#dc2626', fontWeight: 'bold' }}>Sure?</span>
+                          <button onClick={() => handleDelete(c.id)} style={{ background: '#dc2626', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', transition: 'opacity 0.2s' }}><Check size={14}/></button>
+                          <button onClick={() => setDeleteConfirmId(null)} style={{ background: '#f1f5f9', color: '#475569', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer' }}><X size={14}/></button>
                         </div>
                       ) : (
-                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                          <button title="Edit" onClick={() => openEditModal(c)} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer', padding: '0.25rem' }}><Edit2 size={16} /></button>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                          <button title="Edit" onClick={() => openEditModal(c)} style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: '0.25rem', borderRadius: '4px', transition: 'background 0.2s' }}
+                            onMouseOver={e => e.currentTarget.style.background = 'var(--primary-light)'}
+                            onMouseOut={e => e.currentTarget.style.background = 'none'}
+                          ><Edit2 size={15} /></button>
                           <select 
                             value={c.status || 'OPEN'} 
                             onChange={(e) => handleStatusChange(c.id, e.target.value)}
-                            style={{ padding: '0.25rem', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '0.8rem', background: 'var(--surface)' }}
+                            style={{ padding: '0.2rem 0.25rem', border: '1px solid var(--border)', borderRadius: '6px', fontSize: '0.75rem', background: 'var(--surface)', cursor: 'pointer' }}
                           >
                             <option value="OPEN">Open</option><option value="IN_PROGRESS">In_Progress</option>
                             <option value="RESOLVED">Resolved</option><option value="CLOSED">Closed</option>
                             <option value="REJECTED">Rejected</option>
                           </select>
-                          <button title="Delete" onClick={() => setDeleteConfirmId(c.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.25rem' }}><Trash2 size={16} /></button>
+                          <button title="Delete" onClick={() => setDeleteConfirmId(c.id)} style={{ background: 'none', border: 'none', color: '#dc2626', cursor: 'pointer', padding: '0.25rem', borderRadius: '4px', transition: 'background 0.2s' }}
+                            onMouseOver={e => e.currentTarget.style.background = '#fee2e2'}
+                            onMouseOut={e => e.currentTarget.style.background = 'none'}
+                          ><Trash2 size={15} /></button>
                         </div>
                       )}
                     </td>
@@ -289,18 +302,18 @@ const AdminPanel = () => {
               </tbody>
             </table>
             {paginatedComplaints.length === 0 && (
-              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--secondary)' }}>No complaints found matching criteria.</div>
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>No complaints found matching criteria.</div>
             )}
           </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', padding: '1rem 0 0', borderTop: '1px solid var(--border)' }}>
-              <span style={{ fontSize: '0.9rem', color: 'var(--secondary)' }}>Showing {(page-1)*rowsPerPage + 1} to {Math.min(page*rowsPerPage, filteredComplaints.length)} of {filteredComplaints.length}</span>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="btn" style={{ padding: '0.25rem 0.5rem', background: page===1?'#e2e8f0':'var(--surface)', color: 'var(--secondary)', border: '1px solid var(--border)' }}><ChevronLeft size={16}/></button>
-                <div style={{ padding: '0.25rem 0.75rem', fontWeight: 600 }}>{page} / {totalPages}</div>
-                <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="btn" style={{ padding: '0.25rem 0.5rem', background: page===totalPages?'#e2e8f0':'var(--surface)', color: 'var(--secondary)', border: '1px solid var(--border)' }}><ChevronRight size={16}/></button>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.25rem', padding: '1rem 0 0', borderTop: '1px solid var(--border)' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Showing {(page-1)*rowsPerPage + 1} to {Math.min(page*rowsPerPage, filteredComplaints.length)} of {filteredComplaints.length}</span>
+              <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '0.35rem 0.5rem', background: page===1?'#f1f5f9':'var(--surface)', color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '6px', cursor: page===1?'not-allowed':'pointer', display: 'flex', alignItems: 'center' }}><ChevronLeft size={16}/></button>
+                <div style={{ padding: '0.35rem 0.75rem', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)' }}>{page} / {totalPages}</div>
+                <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '0.35rem 0.5rem', background: page===totalPages?'#f1f5f9':'var(--surface)', color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '6px', cursor: page===totalPages?'not-allowed':'pointer', display: 'flex', alignItems: 'center' }}><ChevronRight size={16}/></button>
               </div>
             </div>
           )}
@@ -309,7 +322,7 @@ const AdminPanel = () => {
 
       {/* USERS TAB */}
       {activeTab === 'Users' && (
-        <div className="card" style={{ padding: '1.5rem', overflowX: 'auto' }}>
+        <div className="card animate-fadeIn" style={{ padding: '1.5rem', overflowX: 'auto' }}>
           <table className="data-table" style={{ width: '100%' }}>
             <thead>
               <tr><th>ID</th><th>Username</th><th>Role</th></tr>
@@ -317,10 +330,10 @@ const AdminPanel = () => {
             <tbody>
               {usersList.map((u, i) => (
                 <tr key={u.id || i}>
-                  <td style={{ fontWeight: 600, color: 'var(--secondary)' }}>#{u.id}</td>
-                  <td style={{ fontWeight: 600 }}>{u.username}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--text-secondary)', fontSize: '0.85rem' }}>#{u.id}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{u.username}</td>
                   <td>
-                    <span style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: u.role==='ADMIN'?'#f3e8ff':'#dbeafe', color: u.role==='ADMIN'?'#7e22ce':'#1d4ed8' }}>
+                    <span style={{ padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, background: u.role==='ADMIN'?'#f3e8ff':'#dbeafe', color: u.role==='ADMIN'?'#7c3aed':'#2563eb' }}>
                       {u.role || 'USER'}
                     </span>
                   </td>
@@ -333,48 +346,48 @@ const AdminPanel = () => {
 
       {/* EDIT MODAL */}
       {editingId && editForm && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }} onClick={() => setEditingId(null)} />
-          <div style={{ position: 'relative', width: '90%', maxWidth: '600px', background: 'var(--surface)', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
-            <h2 style={{ marginTop: 0, marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
-              Edit Complaint #{editingId}
-              <button onClick={() => setEditingId(null)} style={{ background: 'none', border:'none', cursor:'pointer', color:'var(--secondary)' }}><X size={24}/></button>
-            </h2>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s ease-out' }}>
+          <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.5)', backdropFilter: 'blur(4px)' }} onClick={() => setEditingId(null)} />
+          <div style={{ position: 'relative', width: '90%', maxWidth: '560px', background: 'var(--surface)', borderRadius: '16px', padding: '1.75rem', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', animation: 'scaleIn 0.25s ease-out' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 600 }}>Edit Complaint #{editingId}</h2>
+              <button onClick={() => setEditingId(null)} style={{ background: 'none', border:'none', cursor:'pointer', color:'var(--text-secondary)', padding: '0.25rem', borderRadius: '6px' }}><X size={22}/></button>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display:'block', marginBottom:'0.5rem', fontWeight:500 }}>Title</label>
+                <label style={{ display:'block', marginBottom:'0.4rem', fontWeight:500, fontSize: '0.85rem', color: '#374151' }}>Title</label>
                 <input className="form-control" type="text" value={editForm.title} onChange={e => setEditForm({...editForm, title: e.target.value})} />
               </div>
               <div>
-                <label style={{ display:'block', marginBottom:'0.5rem', fontWeight:500 }}>Description</label>
+                <label style={{ display:'block', marginBottom:'0.4rem', fontWeight:500, fontSize: '0.85rem', color: '#374151' }}>Description</label>
                 <textarea className="form-control" rows="4" value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} />
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
+              <div style={{ display: 'flex', gap: '0.75rem' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display:'block', marginBottom:'0.5rem', fontWeight:500 }}>Category</label>
+                  <label style={{ display:'block', marginBottom:'0.4rem', fontWeight:500, fontSize: '0.85rem', color: '#374151' }}>Category</label>
                   <select className="form-control" value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})}>
                     <option value="Hardware">Hardware</option><option value="Software">Software</option>
                     <option value="Network">Network</option><option value="Other">Other</option>
                   </select>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display:'block', marginBottom:'0.5rem', fontWeight:500 }}>Priority</label>
+                  <label style={{ display:'block', marginBottom:'0.4rem', fontWeight:500, fontSize: '0.85rem', color: '#374151' }}>Priority</label>
                   <select className="form-control" value={editForm.priority} onChange={e => setEditForm({...editForm, priority: e.target.value})}>
                     <option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option>
                   </select>
                 </div>
               </div>
               <div>
-                <label style={{ display:'block', marginBottom:'0.5rem', fontWeight:500 }}>Status</label>
+                <label style={{ display:'block', marginBottom:'0.4rem', fontWeight:500, fontSize: '0.85rem', color: '#374151' }}>Status</label>
                 <select className="form-control" value={editForm.status} onChange={e => setEditForm({...editForm, status: e.target.value})}>
                   <option value="OPEN">Open</option><option value="IN_PROGRESS">In Progress</option>
                   <option value="RESOLVED">Resolved</option><option value="CLOSED">Closed</option><option value="REJECTED">Rejected</option>
                 </select>
               </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button onClick={() => setEditingId(null)} className="btn" style={{ flex: 1, background: 'var(--background)', color: 'var(--text)', border: '1px solid var(--border)' }}>Cancel</button>
+              <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+                <button onClick={() => setEditingId(null)} className="btn" style={{ flex: 1, background: '#f1f5f9', color: '#475569', border: '1px solid var(--border)' }}>Cancel</button>
                 <button onClick={handleSaveEdit} className="btn" disabled={savingId === editingId} style={{ flex: 1 }}>
-                  {savingId === editingId ? <Loader2 className="animate-spin" size={20} /> : 'Save Changes'}
+                  {savingId === editingId ? <Loader2 className="animate-spin" size={18} /> : 'Save Changes'}
                 </button>
               </div>
             </div>

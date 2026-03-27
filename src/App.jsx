@@ -40,18 +40,18 @@ function App() {
     <ToastProvider>
       <div className="app-container">
         <nav className="navbar">
-          <div className="nav-brand">💡 Resolvify CMS</div>
+          <div className="nav-brand">✦ Resolvify</div>
           <button className="hamburger" onClick={() => setIsNavOpen(!isNavOpen)}>
-            {isNavOpen ? <X size={24} /> : <Menu size={24} />}
+            {isNavOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
           <div className={`nav-links ${isNavOpen ? 'open' : ''}`} onClick={() => setIsNavOpen(false)}>
-            <Link to="/" className={location.pathname === '/' ? 'active' : ''}>Home</Link>
+            <Link to="/" className={location.pathname === '/' || location.pathname === '/home' ? 'active' : ''}>Home</Link>
             <Link to="/complaints" className={location.pathname === '/complaints' ? 'active' : ''}>Complaints</Link>
             <Link to="/create" className={location.pathname === '/create' ? 'active' : ''}>New Complaint</Link>
             {user.role === 'ADMIN' && (
-              <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''} style={{color: 'var(--warning)', fontWeight: 'bold'}}>Admin Panel</Link>
+              <Link to="/admin" className={location.pathname === '/admin' ? 'active' : ''}>Admin Panel</Link>
             )}
-            <button onClick={(e) => { e.stopPropagation(); handleLogout(); setIsNavOpen(false); }} className="btn" style={{ minWidth: '80px', height: '32px', fontSize: '0.85rem' }}>Logout</button>
+            <button onClick={(e) => { e.stopPropagation(); handleLogout(); setIsNavOpen(false); }} className="btn" style={{ minWidth: '80px', height: '34px', fontSize: '0.8rem', borderRadius: '8px' }}>Logout</button>
           </div>
         </nav>
       

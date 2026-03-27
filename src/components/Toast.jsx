@@ -16,6 +16,9 @@ export const ToastProvider = ({ children }) => {
     }, 3000);
   };
 
+  const iconColor = { success: '#059669', error: '#dc2626', info: '#4f46e5' };
+  const borderColor = { success: '#059669', error: '#dc2626', info: '#4f46e5' };
+
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
@@ -23,20 +26,24 @@ export const ToastProvider = ({ children }) => {
         {toasts.map(toast => (
            <div key={toast.id} className="toast-item" style={{
              background: 'var(--surface)', 
-             borderLeft: `4px solid ${toast.type === 'success' ? '#22c55e' : toast.type === 'error' ? '#ef4444' : '#3b82f6'}`,
-             padding: '1rem', 
-             borderRadius: '0.5rem', 
-             boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', 
+             borderLeft: `4px solid ${borderColor[toast.type] || borderColor.info}`,
+             padding: '0.875rem 1rem', 
+             borderRadius: '10px', 
+             boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)', 
              display: 'flex', 
              alignItems: 'center', 
              gap: '0.75rem', 
-             minWidth: '250px'
+             minWidth: '280px',
+             maxWidth: '400px',
            }}>
-             {toast.type === 'success' && <CheckCircle color="#22c55e" size={20}/>}
-             {toast.type === 'error' && <AlertCircle color="#ef4444" size={20}/>}
-             {toast.type === 'info' && <Info color="#3b82f6" size={20}/>}
-             <p style={{ margin: 0, flex: 1, fontSize: '0.9rem', color: 'var(--secondary)', fontWeight: 500 }}>{toast.message}</p>
-             <button onClick={() => setToasts(t => t.filter(x => x.id !== toast.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}><X size={16}/></button>
+             {toast.type === 'success' && <CheckCircle color={iconColor.success} size={18}/>}
+             {toast.type === 'error' && <AlertCircle color={iconColor.error} size={18}/>}
+             {toast.type === 'info' && <Info color={iconColor.info} size={18}/>}
+             <p style={{ margin: 0, flex: 1, fontSize: '0.875rem', color: 'var(--text-primary)', fontWeight: 500 }}>{toast.message}</p>
+             <button onClick={() => setToasts(t => t.filter(x => x.id !== toast.id))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '0.125rem', borderRadius: '4px', transition: 'color 0.2s' }}
+               onMouseOver={e => e.currentTarget.style.color = '#64748b'}
+               onMouseOut={e => e.currentTarget.style.color = '#94a3b8'}
+             ><X size={16}/></button>
            </div>
         ))}
       </div>
