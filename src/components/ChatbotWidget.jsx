@@ -27,11 +27,33 @@ const ChatbotWidget = ({ user }) => {
     }
   }, [messages, isOpen]);
 
+  const SUGGESTED = [
+    { label: '📋 My complaint status',  text: 'What is the status of my complaints?' },
+    { label: '🆕 How to submit issue',   text: 'How do I submit a new complaint?' },
+    { label: '⏱️ Resolution time',       text: 'How long does it take to resolve an issue?' },
+    { label: '🔺 Escalate priority',     text: 'How can I escalate the priority of my complaint?' },
+  ];
+
   const toggleChat = () => setIsOpen(!isOpen);
 
   const clearChat = () => {
     sessionStorage.removeItem('chatHistory');
     setMessages([{ sender: 'bot', text: 'Hi! I am the Resolvify AI Assistant. How can I help you map a complaint or resolve an issue today?' }]);
+  };
+
+  const sendSuggested = (text) => {
+    if (loading) return;
+    setMessages(prev => [...prev, { sender: 'user', text }]);
+    setLoading(true);
+    axios.post(`${API_BASE}/api/chat`, {
+      message: text,
+      userId: user?.id || null,
+      admin: user?.role === 'ADMIN'
+    }).then(res => {
+      setMessages(prev => [...prev, { sender: 'bot', text: res.data?.reply || 'No response.' }]);
+    }).catch(err => {
+      setMessages(prev => [...prev, { sender: 'bot', text: `Error: ${err.response?.data?.error?.message || 'Check console.'}` }]);
+    }).finally(() => setLoading(false));
   };
 
   const sendMessage = async (e) => {
@@ -44,37 +66,13 @@ const ChatbotWidget = ({ user }) => {
     setLoading(true);
 
     try {
-      let complaintsContext = "";
-      if (user?.id && user.role !== 'ADMIN') {
-        try {
-          const dbRes = await axios.get(`${API_BASE}/api/complaints`, { params: { userId: user.id } });
-          if (dbRes.data && dbRes.data.length > 0) {
-            complaintsContext = "User has the following complaints in the system: " + JSON.stringify(dbRes.data.map(c => ({ id: c.id, title: c.title, status: c.status, priority: c.priority })));
-          }
-        } catch (err) { /* ignore db context errors */ }
-      }
+      const response = await axios.post(`${API_BASE}/api/chat`, {
+        message: input,
+        userId: user?.id || null,
+        admin: user?.role === 'ADMIN'
+      });
 
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey || apiKey === "YOUR_API_KEY_HERE") {
-        setMessages(prev => [...prev, { sender: 'bot', text: 'Missing API Key. Please add VITE_GEMINI_API_KEY to .env.local to activate the chatbot.' }]);
-        setLoading(false);
-        return;
-      }
-      
-      const promptText = `You are Resolvify AI, a smart assistant for a Complaint Management System. 
-Keep responses strictly under 3 short sentences. 
-${complaintsContext ? 'CONTEXT: ' + complaintsContext : ''}
-User Input: "${userMsg.text}"`;
-
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          contents: [{ parts: [{ text: promptText }] }]
-        },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-
-      const botText = response.data.candidates[0].content.parts[0].text;
+      const botText = response.data?.reply || 'No response from AI.';
       setMessages(prev => [...prev, { sender: 'bot', text: botText }]);
 
     } catch (err) {
@@ -177,6 +175,29 @@ User Input: "${userMsg.text}"`;
                 <div style={{ padding: '0.75rem 1rem', borderRadius: '12px', backgroundColor: 'white', color: '#94a3b8', boxShadow: '0 1px 3px rgba(0,0,0,0.06)', borderBottomLeftRadius: '4px', fontSize: '0.9rem' }}>
                   Typing...
                 </div>
+              </div>
+            )}
+            {/* Suggested queries — only shown before first user message */}
+            {messages.length === 1 && !loading && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.25rem' }}>
+                <p style={{ margin: '0 0 0.25rem', fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Try asking</p>
+                {SUGGESTED.map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => sendSuggested(s.text)}
+                    style={{
+                      textAlign: 'left', background: 'white', border: '1px solid var(--border)',
+                      borderRadius: '10px', padding: '0.55rem 0.875rem', fontSize: '0.82rem',
+                      color: '#334155', cursor: 'pointer', fontFamily: 'inherit', fontWeight: 500,
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                    }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'; }}
+                    onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)'; }}
+                  >
+                    {s.label}
+                  </button>
+                ))}
               </div>
             )}
             <div ref={messagesEndRef} />
